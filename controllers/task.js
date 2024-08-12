@@ -1,28 +1,20 @@
 const  Task  = require('../models/task');
 
-const createArticle = async (req, res) => {
+const createTask = async (req, res) => {
   try {
-    const { title, body, author, tags } = req.body;
+    const { title, description, id } = req.body;
 
     if(!title){
       return res.status(422).json({error :"Title is required"})
     };
 
-    if(!body){
-      return res.status(422).json({error : "Body is required"})
+    if(!description){
+      return res.status(422).json({error : "Description is required"})
     };
 
-    if(!author){
-      return res.status(422).json({error : "Author is required"})
+    if(!id){
+      return res.status(422).json({error : "User's ID is required"})
     };
-
-    if(!tags){
-      return res.status(422).json({error : "Tags is required"})
-    };
-
-    if(!Array.isArray(tags)){
-      return res.status(400).json({error : "Tags must be in an array"})
-    }
 
     const newArticle = await Article.create({ 
       title : title,
@@ -39,16 +31,36 @@ const createArticle = async (req, res) => {
   }
 };
 
-const getArticlesByPublishingDate = async (req,res) =>{
+const getAllTasks = async (req,res) =>{
   try {
     
-    const articles = await Article.find().sort({createdAt : -1});
+    const tasks = await Task.find().sort({createdAt : -1});
 
-    if(!articles){
-      return res.status(404).json({error : "There are no articles"})
+    if(!tasks){
+      return res.status(404).json({error : "There are no tasks"})
     }
 
-    return res.status(200).json({result : articles})
+    return res.status(200).json({result : tasks})
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
+const deleteTask = async (req,res) => {
+  try {
+    const {id} = req.params;
+
+    const checkExistence = await Task.findById(id).exec();
+
+    if(!checkExistence){
+      return res.status(404).json({error : "No existing task matches this ID"});
+    }
+
+    const deleteTask = await Task.findByIdAndDelete(id).exec();
+
+    return res.status(200).json({message : "Task successfully deleted"})
+    
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });
@@ -56,8 +68,8 @@ const getArticlesByPublishingDate = async (req,res) =>{
 }
 
 
-
 module.exports = {
-  createArticle,
-  getArticlesByPublishingDate
+  createTask,
+  getAllTasks,
+  deleteTask
 };
