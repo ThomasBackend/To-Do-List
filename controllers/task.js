@@ -16,14 +16,13 @@ const createTask = async (req, res) => {
       return res.status(422).json({error : "User's ID is required"})
     };
 
-    const newArticle = await Article.create({ 
+    const newTask = await Task.create({ 
       title : title,
-      body : body,
-      author : author,
-      tags : tags
+      description : description,
+      userId : id
     });
 
-    res.status(201).json(newArticle);
+    res.status(201).json({message : "Task Created Successfully", data : newTask});
   }
   catch (error) {
     console.log(error);
