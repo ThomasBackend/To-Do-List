@@ -1,10 +1,10 @@
 const express = require('express');
-const {} = require('../controllers/user')
+const {registerUser, login} = require('../controllers/user')
 
 const router = express.Router();
 
-router.get('/fetch/date', getArticlesByPublishingDate);
-router.post('/create', createArticle);
+router.post('/register', registerUser);
+router.post('/login', login);
 
 
 module.exports = router;
