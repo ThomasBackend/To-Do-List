@@ -1,37 +1,32 @@
-const   Article   = require('../models/article');
+const  User  = require('../models/user');
+const customUtility = require('../utils/utility');
 
-const createArticle = async (req, res) => {
+const registerUser = async (req, res) => {
   try {
-    const { title, body, author, tags } = req.body;
+    const { email, password, username } = req.body;
 
-    if(!title){
-      return res.status(422).json({error :"Title is required"})
+    if(!email){
+      return res.status(422).json({error :"Email is required"});
     };
 
-    if(!body){
-      return res.status(422).json({error : "Body is required"})
+    if(!password){
+      return res.status(422).json({error : "Password is required"});
     };
 
-    if(!author){
-      return res.status(422).json({error : "Author is required"})
+    if(!username){
+      return res.status(422).json({error : "Username is required"});
     };
 
-    if(!tags){
-      return res.status(422).json({error : "Tags is required"})
-    };
+    const hashedPassword = await customUtility.hashPassword(password);
 
-    if(!Array.isArray(tags)){
-      return res.status(400).json({error : "Tags must be in an array"})
-    }
 
-    const newArticle = await Article.create({ 
-      title : title,
-      body : body,
-      author : author,
-      tags : tags
+    const newUser = await User.create({ 
+      email : email,
+      password : hashedPassword,
+      username : username
     });
 
-    res.status(201).json(newArticle);
+    res.status(201).json({message : "User created successfully"});
   }
   catch (error) {
     console.log(error);
@@ -39,25 +34,42 @@ const createArticle = async (req, res) => {
   }
 };
 
-const getArticlesByPublishingDate = async (req,res) =>{
-  try {
-    
-    const articles = await Article.find().sort({createdAt : -1});
+const login = async (req,res) => {
+try {
+  const {email, password} = req.body;
 
-    if(!articles){
-      return res.status(404).json({error : "There are no articles"})
-    }
+  if(!email){
+    return res.status(422).json({error :"Email is required"});
+  };
 
-    return res.status(200).json({result : articles})
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: error.message });
+  if(!password){
+    return res.status(422).json({error :"Password is required"});
+  };
+
+  const existsCheck = await User.find({ email : email});
+
+  if(existsCheck.length === 0){
+    return res.status(404).json({error : "Email not registered"});
   }
+
+  const hashedPassword = await customUtility.hashPassword(password);
+
+  const loginCheck = await User.find({email : email, password : hashedPassword});
+
+  if(login.length === 0){
+    return res.status(404).json({error : "Email or password invalid"});
+  }
+
+  return res.status(200).json({message : "Login successful"})
+
+} catch (error) {
+  console.log(error);
+    res.status(500).json({ error: error.message });
+}
 }
 
 
-
 module.exports = {
-  createArticle,
-  getArticlesByPublishingDate
+  registerUser,
+  login
 };
