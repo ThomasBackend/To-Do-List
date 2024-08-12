@@ -1,0 +1,10 @@
+{
+    "build": {
+      "commands": [
+        "npm install" 
+      ],
+      "prebuild": [ 
+        "npm install mongoose"
+      ]
+    }
+  }
