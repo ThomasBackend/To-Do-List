@@ -1,27 +1,30 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const articleSchema = new Schema(
+const taskSchema = new Schema(
     {
         title :{
             type : String,
             required : true
         },
-        body :{
+        description :{
             type : String,
             required : true
         },
-        author :{
+        status :{
             type : String,
-            required : true
+            enum : ['pending','done'],
+            required : true,
+            default: "pending"
         },
-        tags :{
-            type : [String],
-            required : true
+        userId :{
+            type : String,
+            required : true,
+            default: "pending"
         }
     }, {timestamps : true}
 );
 
-const Article = mongoose.model('Article',articleSchema);
+const Task = mongoose.model('Task',taskSchema);
 
-module.exports = Article ;
+module.exports = Task ;
