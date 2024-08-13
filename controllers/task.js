@@ -175,6 +175,23 @@ const getSingleTask = async (req,res) => {
     res.status(500).json({ error: error.message });
   }
 }
+
+const updateTaskStatus = async (req,res) => {
+  const {userId, taskId, status} = req.params;
+
+  if(!userId){
+    return res.status(422).json({error : "A new task description is required"});
+  }
+
+  if(!taskId){
+    return res.status(422).json({error : "A new task description is required"});
+  }
+
+  if(!status){
+    return res.status(422).json({error : "A new task description is required"});
+  }
+}
+
 module.exports = {
   createTask,
   getAllTasks,
