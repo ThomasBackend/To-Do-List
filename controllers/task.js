@@ -90,8 +90,34 @@ const updateTaskTitle = async (req,res) => {
   }
 }
 
+const updateTaskDescription = async (req,res) => {
+  try {
+    const {id} = req.params;
+    const {description} = req.body;
+
+    if(!description){
+      return res.status(422).json({error : "A new task description is required"});
+    }
+
+    const checkExistence = await Task.findById(id).exec();
+
+    if(!checkExistence){
+      return res.status(404).json({error : "No existing task matches this ID"});
+    }
+
+    const updateTask = await Task.findByIdAndUpdate(id, {description : description}).exec();
+
+    return res.status(200).json({newDescription : description, oldDescription : updateTask.description})
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
 module.exports = {
   createTask,
   getAllTasks,
-  deleteTask
+  deleteTask,
+  updateTaskTitle,
+  updateTaskDescription
 };
