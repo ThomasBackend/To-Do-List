@@ -1,4 +1,5 @@
 const  Task  = require('../models/task');
+const  User  = require('../models/user');
 
 const createTask = async (req, res) => {
   try {
@@ -48,12 +49,24 @@ const getAllTasks = async (req,res) =>{
 
 const deleteTask = async (req,res) => {
   try {
-    const {id} = req.params;
+    const {userId, taskId} = req.params;
 
-    const checkExistence = await Task.findById(id).exec();
+    const checkUserExistence = await User.findById(userId).exec();
 
-    if(!checkExistence){
-      return res.status(404).json({error : "No existing task matches this ID"});
+    if(!checkUserExistence){
+      return res.status(404).json({error : "No existing user matches this ID"});
+    }
+
+    const checkTaskExistence = await Task.findById(taskId).exec();
+
+    if(!checkTaskExistence){
+      return res.status(404).json({error : "Task does not exist"})
+    }
+
+    const singleTask = await Task.find({_id : taskId, userId : userId });
+
+    if(singleTask.length === 0){
+      return res.status(404).json({error : "Task does not belong to specified user"})
     }
 
     const deleteTask = await Task.findByIdAndDelete(id).exec();
@@ -132,11 +145,42 @@ const getAllTasksByUser = async (req,res) =>{
   }
 }
 
+const getSingleTask = async (req,res) => {
+  try {
+    const {userId, taskId} = req.params;
+
+    const checkUserExistence = await User.findById(userId).exec();
+
+    if(!checkUserExistence){
+      return res.status(404).json({error : "No existing user matches this ID"});
+    }
+
+    const checkTaskExistence = await Task.findById(taskId).exec();
+
+    if(!checkTaskExistence){
+      return res.status(404).json({error : "No existing task matches this ID"})
+    }
+
+    const singleTask = await Task.find({_id : taskId, userId : userId });
+
+    if(singleTask.length === 0){
+      return res.status(404).json({error : "Task does not belong to specified user"})
+    }
+
+    return res.status(200).json({message : "Task fetched successfully", data : singleTask})
+
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+}
 module.exports = {
   createTask,
   getAllTasks,
   deleteTask,
   updateTaskTitle,
   updateTaskDescription,
-  getAllTasksByUser
+  getAllTasksByUser,
+  getSingleTask
 };
