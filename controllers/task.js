@@ -66,6 +66,29 @@ const deleteTask = async (req,res) => {
   }
 }
 
+const updateTaskTitle = async (req,res) => {
+  try {
+    const {id} = req.params;
+    const {title} = req.body;
+
+    if(!title){
+      return res.status(422).json({error : "A new task title is required"});
+    }
+
+    const checkExistence = await Task.findById(id).exec();
+
+    if(!checkExistence){
+      return res.status(404).json({error : "No existing task matches this ID"});
+    }
+
+    const updateTask = await Task.findByIdAndUpdate(id, {title : title}).exec();
+
+    return res.status(200).json({newTitle : title, oldTitle : updateTask.title})
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+}
 
 module.exports = {
   createTask,
