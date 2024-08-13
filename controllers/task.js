@@ -35,7 +35,7 @@ const getAllTasks = async (req,res) =>{
     
     const tasks = await Task.find().sort({createdAt : -1});
 
-    if(!tasks){
+    if(tasks.length === 0){
       return res.status(404).json({error : "There are no tasks"})
     }
 
@@ -114,10 +114,29 @@ const updateTaskDescription = async (req,res) => {
   }
 }
 
+const getAllTasksByUser = async (req,res) =>{
+  try {
+    
+    const {id} = req.params;
+
+    const tasks = await Task.find({userId : id}).sort({createdAt : -1}).exec();
+
+    if(tasks.length === 0){
+      return res.status(404).json({error : "There are no tasks"})
+    }
+
+    return res.status(200).json({result : tasks})
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
 module.exports = {
   createTask,
   getAllTasks,
   deleteTask,
   updateTaskTitle,
-  updateTaskDescription
+  updateTaskDescription,
+  getAllTasksByUser
 };
